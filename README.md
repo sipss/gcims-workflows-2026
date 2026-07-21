@@ -26,15 +26,7 @@ cd gcims-workflows-2026
 # 2. Create a virtual environment named 'venv'
 python -m venv venv
 
-# 3. Activate the virtual environment:
-# - On Linux / macOS:
-source venv/bin/activate
-# - On Windows (Command Prompt):
-venv\Scripts\activate.bat
-# - On Windows (PowerShell):
-venv\Scripts\Activate.ps1
-
-# 4. Install required dependencies
+# 3. Install required dependencies
 pip install -r requirements.txt
 ```
 
