@@ -3,11 +3,15 @@
 This repository contains the code and data processing pipelines for the updated version of the paper: *"Enhancing Signal Stability in Untargeted GC-IMS Metabolomics: Removing Batch and Time Effects via Orthogonal Projections"* (2026).
 
 ## Repository Structure and Contents
-* `data/`: Contains the empirical raw matrices and metadata files (`peak_table_var.csv`, etc.).
-* `notebooks/`: Jupyter notebooks containing the evaluation workflows, hyperparameter tuning, and statistical analysis.
+* `data/`: Empirical raw matrices and metadata files (`peak_table_var.csv`, `peak_table_pool.csv`, `annotations_pool.csv`).
+* `docs/`: Evaluation workflows and analysis outputs:
+  * `figures/`: Saved visualizations (high-resolution PNG/PDF plots).
+  * `grid_results/`: Exported benchmarks and intermediate simulation outputs.
+  * `Enhancing_Signal_Stability_in_untargeted_GCIMS_Metabolomics_Removing_Batch_and_Time_Effects_via_Orthogonal_Projections.ipynb`: Main analysis and demonstration notebook.
+  * `df_master.csv`: Aggregated master metrics and benchmark results table.
 * `src/`: Python source code modules.
     * `models.py`: Implementations of `EPOCorrector`, `LOESSCorrector`, and `SERRFCorrector`.
-    * `synthetic_engine.py`: Engine for generating semi-synthetic drift scenarios.
+    * `synthetic_engine.py`: Engine for generating semi-synthetic data from our real pooled urine samples.
     * `utils.py`: Data loading and formatting utilities.
 * `docs/figures/`: Auto-generated output plots and statistical visualizations.
 
