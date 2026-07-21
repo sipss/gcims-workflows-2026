@@ -15,9 +15,9 @@ This repository contains the code and data processing pipelines for the updated 
 This project was developed using Python. To reproduce the analysis, create a virtual environment and install the required dependencies:
 
 ```bash
-# 1. Clone the repository (replace 'tu-usuario' with your actual GitHub username)
-git clone [https://github.com/tu-usuario/bueno-IBEC-P048.git](https://github.com/tu-usuario/bueno-IBEC-P048.git)
-cd bueno-IBEC-P048
+# 1. Clone the repository
+git clone [https://github.com/adrianrefe4/gcims-workflows-2026.git](https://github.com/adrianrefe4/gcims-workflows-2026.git)
+cd gcims-workflows-2026
 
 # 2. Create a virtual environment named 'venv'
 python -m venv venv
