@@ -32,6 +32,35 @@ class SimpleClinicalSyntheticGCIMSEngine:
         7: ["QC", "A", "B", "QC", "A", "QC", "B", "QC", "A", "QC", "B", "A", "QC", "B", "QC"]
     }
 
+    @staticmethod
+    def _build_layout_pattern(qc_count: int, batch_size: int = 15) -> list[str]:
+        """Build a deterministic per-batch layout for arbitrary QC counts."""
+        if not (1 <= qc_count <= batch_size):
+            raise ValueError(f"qc_count_per_batch must be between 1 and {batch_size}.")
+
+        # Keep legacy layouts for 3/5/7 to preserve historical behavior.
+        if qc_count in SimpleClinicalSyntheticGCIMSEngine.LAYOUT_PATTERNS:
+            return SimpleClinicalSyntheticGCIMSEngine.LAYOUT_PATTERNS[qc_count]
+
+        # Evenly spread QC injections across the acquisition order.
+        qc_positions = np.unique(np.round(np.linspace(0, batch_size - 1, qc_count)).astype(int))
+        if qc_positions.size != qc_count:
+            # Fallback for pathological rounding collisions.
+            qc_positions = np.arange(qc_count, dtype=int)
+
+        pattern = ["Patient"] * batch_size
+        for pos in qc_positions:
+            pattern[int(pos)] = "QC"
+
+        # Alternate patient labels to keep both classes represented.
+        patient_label = "A"
+        for i in range(batch_size):
+            if pattern[i] == "Patient":
+                pattern[i] = patient_label
+                patient_label = "B" if patient_label == "A" else "A"
+
+        return pattern
+
     def __init__(
         self,
         X_raw: np.ndarray,
@@ -49,8 +78,9 @@ class SimpleClinicalSyntheticGCIMSEngine:
         self.batch_labels = np.asarray(batch_labels, dtype=int)
         self.run_order = np.asarray(run_order, dtype=int)
         
-        if qc_count_per_batch not in self.LAYOUT_PATTERNS:
-            raise ValueError("qc_count_per_batch must be exactly 3, 5, or 7.")
+        # Comment exeption for qc_count_per_batch to allow for more flexible layouts in the future (specially for scalability analysis)
+        # if qc_count_per_batch not in self.LAYOUT_PATTERNS:
+        #   raise ValueError("qc_count_per_batch must be exactly 3, 5, or 7.")
         if not (1 <= n_biomarkers <= self.X_raw.shape[1]):
             raise ValueError(f"n_biomarkers must be between 1 and {self.X_raw.shape[1]}.")
             
@@ -69,15 +99,21 @@ class SimpleClinicalSyntheticGCIMSEngine:
         sample_type = np.full(self.N, "Unknown", dtype=object)
         group_col = np.full(self.N, "QC", dtype=object)
         
-        pattern = self.LAYOUT_PATTERNS[self.qc_count]
         unique_batches = np.unique(self.batch_labels)
+        
+        # Dynamically detect the batch size from the first batch
+        dynamic_batch_size = len(np.where(self.batch_labels == unique_batches[0])[0])
+        
+        # Pass the detected batch size to your new layout generator
+        pattern = self._build_layout_pattern(self.qc_count, batch_size=dynamic_batch_size)
         
         for b in unique_batches:
             idx_in_batch = np.where(self.batch_labels == b)[0]
             sorted_idx = idx_in_batch[np.argsort(self.run_order[idx_in_batch])]
             
-            if len(sorted_idx) != 15:
-                raise ValueError(f"Batch {b} does not contain exactly 15 samples.")
+            # Dynamic safety check
+            if len(sorted_idx) != dynamic_batch_size:
+                raise ValueError(f"Batch {b} contains {len(sorted_idx)} samples. Expected {dynamic_batch_size}.")
                 
             for i, assignment in enumerate(pattern):
                 global_idx = sorted_idx[i]
