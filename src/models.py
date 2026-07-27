@@ -1,4 +1,4 @@
-"""Model definitions"""
+﻿"""Model definitions"""
 
 from __future__ import annotations
 
@@ -38,11 +38,9 @@ from typing import List, Tuple, Union
 
 
 
-class EPOCorrector(BaseEstimator, TransformerMixin):
+class ISFO(BaseEstimator, TransformerMixin):
     """
-    External Parameter Orthogonalization (EPO) corrector for multivariate data.
-
-    This transformer removes technical variance associated with external
+    This correction method removes technical variance associated with external
     acquisition factors (e.g., batch effects, temporal drift) using the 
     orthogonal projection workflow described by Duran-Fort et al.
 
@@ -272,7 +270,7 @@ class EPOCorrector(BaseEstimator, TransformerMixin):
 
         **Warning:** Because this uses a sample-space projector, `X` must have 
         the exact same number of samples (and in the same order) as the data 
-        passed to `fit()`. For new/unseen samples, use the `InductiveEPOCorrector` 
+        passed to `fit()`. For new/unseen samples, use the `InductiveISFO` 
         wrapper instead.
 
         Parameters
@@ -298,8 +296,8 @@ class EPOCorrector(BaseEstimator, TransformerMixin):
             raise ValueError(
                 f"Sample dimension mismatch. Expected {self.n_samples_in_}, "
                 f"but received {X.shape[0]}. "
-                "Note: EPOCorrector is a sample-space projector. To transform "
-                "new samples, you must wrap this model in InductiveEPOCorrector."
+                "Note: ISFO is a sample-space projector. To transform "
+                "new samples, you must wrap this model in InductiveISFO."
             )
 
         X_centered = X - self.mean_
@@ -460,4 +458,5 @@ class SERRFCorrector(BaseEstimator, TransformerMixin):
             global_time = (batch_numeric * offset_multiplier) + meta['acq_order'].values
             return global_time.astype(float)
         return np.array(meta).flatten().astype(float)
+
 
